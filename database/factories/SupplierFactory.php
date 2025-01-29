@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\DocumentType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,10 +17,17 @@ class SupplierFactory extends Factory
      */
     public function definition(): array
     {
+        $documentType = $this->faker->randomElement(DocumentType::values());
+
         return [
             'name' => $this->faker->name,
+            'document_type' => $documentType,
+            'document_number' => $this->faker->unique()->numerify(str_repeat('#', match ($documentType) {
+                DocumentType::CPF->value => 11,
+                DocumentType::CNPJ->value => 14,
+            })),
             'email' => $this->faker->unique()->safeEmail,
-            'phone' => $this->faker->phoneNumber,
+            'phone' => $this->faker->unique()->numerify('###########'),
             'address' => $this->faker->address,
         ];
     }

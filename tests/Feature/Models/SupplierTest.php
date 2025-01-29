@@ -44,14 +44,9 @@ class SupplierTest extends TestCase
         ]);
     }
 
-    public function test_create_supplier()
+    public function test_store_supplier()
     {
-        $data = [
-            'name' => $this->faker->company,
-            'email' => $this->faker->email,
-            'phone' => preg_replace('/[^0-9]/', '', $this->faker->phoneNumber),
-            'address' => $this->faker->address,
-        ];
+        $data = Supplier::factory()->make()->toArray();
 
         $response = $this->post('/api/suppliers', $data);
 
@@ -63,6 +58,8 @@ class SupplierTest extends TestCase
             'data' => [
                 'id',
                 'name',
+                'document_type',
+                'document_number',
                 'email',
                 'phone',
                 'address',
@@ -79,15 +76,10 @@ class SupplierTest extends TestCase
         $this->assertDatabaseHas('suppliers', $data);
     }
 
-    public function test_create_supplier_and_clear_phone()
+    public function test_store_supplier_and_clear_phone()
     {
-        $phone = preg_replace('/([\d]{2})([\d]{4})([\d]{4,5})/', '($1) $2-$3', $this->faker->phoneNumber);
-        $data = [
-            'name' => $this->faker->company,
-            'email' => $this->faker->email,
-            'phone' => $phone,
-            'address' => $this->faker->address,
-        ];
+        $data = Supplier::factory()->make()->toArray();
+        $data['phone'] = $this->faker->numerify('(##) #####-####');
 
         $response = $this->post('/api/suppliers', $data);
 
@@ -99,6 +91,8 @@ class SupplierTest extends TestCase
             'data' => [
                 'id',
                 'name',
+                'document_type',
+                'document_number',
                 'email',
                 'phone',
                 'address',
@@ -112,13 +106,12 @@ class SupplierTest extends TestCase
 
         $this->assertDatabaseHas('suppliers', [
             ...$data,
-            'phone' => preg_replace('/[^0-9]/', '', $phone),
+            'phone' => preg_replace('/[^0-9]/', '', $data['phone']),
         ]);
-
     }
 
     #[DataProvider('invalidDataProvider')]
-    public function test_create_supplier_with_invalid_data($data, $field)
+    public function test_store_supplier_with_invalid_data($data, $field)
     {
         $response = $this->withHeader('Accept', 'application/json')->post('/api/suppliers', $data);
 
@@ -136,10 +129,64 @@ class SupplierTest extends TestCase
     {
         return [
             [['name' => '', 'email' => '', 'phone' => '', 'address' => ''], 'name'],
+            [['name' => str_repeat('a', 256), 'email' => '', 'phone' => '', 'address' => ''], 'name'],
             [['name' => 'Supplier Company', 'email' => '', 'phone' => '', 'address' => ''], 'email'],
+            [['name' => 'Supplier Company', 'email' => str_repeat('a', 256) . '@test.com', 'phone' => '', 'address' => ''], 'email'],
             [['name' => 'Supplier Company', 'email' => 'test.test', 'phone' => '', 'address' => ''], 'email'],
             [['name' => 'Supplier Company', 'email' => 'test@test.com', 'phone' => '', 'address' => ''], 'phone'],
+            [['name' => 'Supplier Company', 'email' => 'test@test.com', 'phone' => '9999999999999999', 'address' => ''], 'phone'],
             [['name' => 'Supplier Company', 'email' => 'test@test.com', 'phone' => '081234567890', 'address' => ''], 'address'],
         ];
+    }
+
+    public function test_update_supplier()
+    {
+        $supplier = Supplier::factory()->create();
+
+        $data = Supplier::factory()->make()->toArray();
+
+        $response = $this->put("/api/suppliers/{$supplier->id}", $data);
+
+        $response->assertStatus(200);
+
+        $response->assertJsonStructure([
+            'status',
+            'message',
+            'data' => [
+                'id',
+                'name',
+                'document_type',
+                'document_number',
+                'email',
+                'phone',
+                'address',
+            ],
+        ]);
+
+        $response->assertJsonFragment([
+            'status' => 'success',
+            'message' => 'Data successfully updated.',
+        ]);
+
+        $response->assertJsonFragment($data);
+
+        $this->assertDatabaseHas('suppliers', $data);
+    }
+
+    #[DataProvider('invalidDataProvider')]
+    public function test_update_supplier_with_invalid_data($data, $field)
+    {
+        $supplier = Supplier::factory()->create();
+
+        $response = $this->withHeader('Accept', 'application/json')->put("/api/suppliers/{$supplier->id}", $data);
+
+        $response->assertStatus(422);
+
+        $response->assertJsonStructure([
+            'message',
+            'errors' => [
+                $field,
+            ],
+        ]);
     }
 }

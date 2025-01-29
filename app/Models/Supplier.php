@@ -18,10 +18,20 @@ class Supplier extends Model
      */
     protected $fillable = [
         'name',
+        'document_type',
+        'document_number',
         'email',
         'phone',
         'address',
     ];
+
+    public function documentNumber(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value,
+            set: fn ($value) => preg_replace('/[^0-9]/', '', $value),
+        );
+    }
 
     public function phone(): Attribute
     {
