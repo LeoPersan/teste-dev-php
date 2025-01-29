@@ -118,6 +118,7 @@ class SupplierTest extends TestCase
         $response->assertStatus(422);
 
         $response->assertJsonStructure([
+            'status',
             'message',
             'errors' => [
                 $field,
@@ -173,6 +174,23 @@ class SupplierTest extends TestCase
         $this->assertDatabaseHas('suppliers', $data);
     }
 
+
+    public function test_update_supplier_not_found()
+    {
+        $response = $this->withHeader('Accept', 'application/json')->put('/api/suppliers/1', []);
+
+        $response->assertStatus(404);
+
+        $response->assertJsonStructure([
+            'message',
+        ]);
+
+        $response->assertJsonFragment([
+            'status' => 'error',
+            'message' => 'Supplier not found.',
+        ]);
+    }
+
     #[DataProvider('invalidDataProvider')]
     public function test_update_supplier_with_invalid_data($data, $field)
     {
@@ -183,10 +201,48 @@ class SupplierTest extends TestCase
         $response->assertStatus(422);
 
         $response->assertJsonStructure([
+            'status',
             'message',
             'errors' => [
                 $field,
             ],
+        ]);
+    }
+
+    public function test_delete_supplier()
+    {
+        $supplier = Supplier::factory()->create();
+
+        $response = $this->delete("/api/suppliers/{$supplier->id}");
+
+        $response->assertStatus(200);
+
+        $response->assertJsonStructure([
+            'status',
+            'message',
+        ]);
+
+        $response->assertJsonFragment([
+            'status' => 'success',
+            'message' => 'Data successfully deleted.',
+        ]);
+
+        $this->assertDatabaseMissing('suppliers', $supplier->toArray());
+    }
+
+    public function test_delete_supplier_not_found()
+    {
+        $response = $this->withHeader('Accept', 'application/json')->delete('/api/suppliers/1');
+
+        $response->assertStatus(404);
+
+        $response->assertJsonStructure([
+            'message',
+        ]);
+
+        $response->assertJsonFragment([
+            'status' => 'error',
+            'message' => 'Supplier not found.',
         ]);
     }
 }
