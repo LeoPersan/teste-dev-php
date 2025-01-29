@@ -36,11 +36,11 @@ class SupplierTest extends TestCase
                 '*' => [
                     'id',
                     'name',
+                    'document_type',
+                    'document_number',
                     'email',
                     'phone',
                     'address',
-                    'created_at',
-                    'updated_at',
                 ],
             ],
         ]);
