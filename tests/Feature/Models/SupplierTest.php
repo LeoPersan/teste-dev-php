@@ -44,6 +44,54 @@ class SupplierTest extends TestCase
         ]);
     }
 
+    #[DataProvider('paginationDataProvider')]
+    public function test_get_supplier_pagination($perPage)
+    {
+        Supplier::factory()->count(15)->create();
+        $maxPage = ceil(15 / $perPage);
+
+        for ($page = 1; $page <= $maxPage; $page++) {
+            $response = $this->get("/api/suppliers?per_page=$perPage&page=$page");
+
+            $count = $page < $maxPage ? $perPage : 15 % $perPage;
+            $count = $count === 0 ? $perPage : $count;
+
+            $response->assertStatus(200);
+
+            $response->assertJsonCount($count, 'data');
+
+            $response->assertJsonFragment([
+                'status' => 'success',
+                'message' => 'Data successfully retrieved.',
+            ]);
+        }
+    }
+
+    public static function paginationDataProvider(): array
+    {
+        return [
+            [1],
+            [5],
+            [10],
+            [15],
+        ];
+    }
+
+    public function test_get_supplier_with_search()
+    {
+        $suppliers = Supplier::factory()->count(5)->create();
+
+        foreach ($suppliers as $supplier) {
+            $this->get("/api/suppliers?document_number={$supplier->document_number}")
+                ->assertJsonCount(1, 'data')
+                ->assertJsonFragment(['document_number' => $supplier->document_number]);
+        }
+
+        $this->get('/api/suppliers?document_number=1234567890')
+            ->assertJsonCount(0, 'data');
+    }
+
+
     public function test_store_supplier()
     {
         $data = Supplier::factory()->make()->toArray();

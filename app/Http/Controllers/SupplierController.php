@@ -5,18 +5,19 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSupplierRequest;
 use App\Http\Requests\UpdateSupplierRequest;
 use App\Models\Supplier;
+use Illuminate\Http\Request;
 
 class SupplierController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         return response()->json([
             'status' => 'success',
             'message' => 'Data successfully retrieved.',
-            'data' => Supplier::all(),
+            'data' => Supplier::search($request->all())->simplePaginate($request->per_page ?? 10)->items(),
         ]);
     }
 

@@ -40,4 +40,17 @@ class Supplier extends Model
             set: fn ($value) => preg_replace('/[^0-9]/', '', $value),
         );
     }
+
+    public function scopeSearch($query, array $filters)
+    {
+        $query->when(
+            $filters['document_number'] ?? null,
+            fn ($query, $documentNumber) => $query->documentNumber($documentNumber)
+        );
+    }
+
+    public function scopeDocumentNumber($query, $documentNumber)
+    {
+        return $query->where('document_number', preg_replace('/[^0-9]/', '', $documentNumber));
+    }
 }
