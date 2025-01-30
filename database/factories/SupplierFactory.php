@@ -22,10 +22,10 @@ class SupplierFactory extends Factory
         return [
             'name' => $this->faker->name,
             'document_type' => $documentType,
-            'document_number' => $this->faker->unique()->numerify(str_repeat('#', match ($documentType) {
-                DocumentType::CPF->value => 11,
-                DocumentType::CNPJ->value => 14,
-            })),
+            'document_number' => match ($documentType) {
+                DocumentType::CPF->value => MakeCpf::make(),
+                DocumentType::CNPJ->value => MakeCnpj::make(),
+            },
             'email' => $this->faker->unique()->safeEmail,
             'phone' => $this->faker->unique()->numerify('###########'),
             'address' => $this->faker->address,

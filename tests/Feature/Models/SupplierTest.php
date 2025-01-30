@@ -5,12 +5,21 @@ namespace Tests\Feature\Models;
 use App\Models\Supplier;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class SupplierTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Http::fake([
+            'brasilapi.com.br/api/cnpj/v1/*' => Http::response('', 200),
+        ]);
+    }
 
     public function test_get_supplier()
     {
