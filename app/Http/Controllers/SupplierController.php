@@ -19,17 +19,21 @@ class SupplierController extends Controller
         $validated = $request->validate([
             /**
              * @query
+             *
              * @default 1
              */
             'page' => ['integer', 'min:1'],
             /**
              * @query
+             *
              * @default 10
              */
             'per_page' => ['integer', 'min:1'],
             /**
              * Filter Supplier by CPF or CNPJ.
+             *
              * @query
+             *
              * @example 99.999.999/0001-99
              */
             'document_number' => ['string', 'max:18'],

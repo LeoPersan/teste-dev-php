@@ -14,8 +14,8 @@ class Cpf implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!self::validateCpf($value)) {
-            $fail("The :attribute is invalid.");
+        if (! self::validateCpf($value)) {
+            $fail('The :attribute is invalid.');
         }
     }
 

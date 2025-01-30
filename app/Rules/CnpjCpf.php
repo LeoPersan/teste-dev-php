@@ -11,7 +11,8 @@ class CnpjCpf implements DataAwareRule, ValidationRule
 {
     protected array $data = [];
 
-    public function __construct(protected readonly bool $safe = true) {
+    public function __construct(protected readonly bool $safe = true)
+    {
     }
 
     public function setData(array $data): static
@@ -28,8 +29,8 @@ class CnpjCpf implements DataAwareRule, ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!$this->validateAux($value)) {
-            $fail("The :attribute is invalid.");
+        if (! $this->validateAux($value)) {
+            $fail('The :attribute is invalid.');
         }
     }
 

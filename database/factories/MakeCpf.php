@@ -2,7 +2,8 @@
 
 namespace Database\Factories;
 
-class MakeCpf {
+class MakeCpf
+{
     public static function make(): string
     {
         $faker = \Faker\Factory::create();

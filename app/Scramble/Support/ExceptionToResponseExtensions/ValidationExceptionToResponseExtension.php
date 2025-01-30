@@ -22,22 +22,22 @@ class ValidationExceptionToResponseExtension extends ExceptionToResponseExtensio
 
     public function toResponse(Type $type)
     {
-        $validationResponseBodyType = (new OpenApiTypes\ObjectType)
+        $validationResponseBodyType = (new OpenApiTypes\ObjectType())
             ->addProperty(
                 'status',
-                (new OpenApiTypes\StringType)
+                (new OpenApiTypes\StringType())
                     ->setDescription('"success" or "error"')
             )
             ->addProperty(
                 'message',
-                (new OpenApiTypes\StringType)
+                (new OpenApiTypes\StringType())
                     ->setDescription('Errors overview.')
             )
             ->addProperty(
                 'errors',
-                (new OpenApiTypes\ObjectType)
+                (new OpenApiTypes\ObjectType())
                     ->setDescription('A detailed description of each field that failed validation.')
-                    ->additionalProperties((new OpenApiTypes\ArrayType)->setItems(new OpenApiTypes\StringType))
+                    ->additionalProperties((new OpenApiTypes\ArrayType())->setItems(new OpenApiTypes\StringType()))
             )
             ->setRequired(['message', 'errors']);
 

@@ -26,15 +26,15 @@ class NotFoundExceptionToResponseExtension extends ExceptionToResponseExtension
 
     public function toResponse(Type $type)
     {
-        $validationResponseBodyType = (new OpenApiTypes\ObjectType)
+        $validationResponseBodyType = (new OpenApiTypes\ObjectType())
             ->addProperty(
                 'status',
-                (new OpenApiTypes\StringType)
+                (new OpenApiTypes\StringType())
                     ->setDescription('"success" or "error"')
             )
             ->addProperty(
                 'message',
-                (new OpenApiTypes\StringType)
+                (new OpenApiTypes\StringType())
                     ->setDescription('Error overview.')
             )
             ->setRequired(['message']);
