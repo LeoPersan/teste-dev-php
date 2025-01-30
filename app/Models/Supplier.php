@@ -68,4 +68,11 @@ class Supplier extends Model
     {
         $query->where('document_number', preg_replace('/[^0-9]/', '', $documentNumber));
     }
+
+    protected static function booted(): void
+    {
+        static::saved(fn () => cache()->tags('suppliers')->flush());
+        static::deleted(fn () => cache()->tags('suppliers')->flush());
+        static::updated(fn () => cache()->tags('suppliers')->flush());
+    }
 }

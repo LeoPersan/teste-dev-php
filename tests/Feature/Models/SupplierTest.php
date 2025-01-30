@@ -55,8 +55,10 @@ class SupplierTest extends TestCase
     }
 
     #[DataProvider('paginationDataProvider')]
-    public function test_get_supplier_pagination($perPage)
+    public function test_get_supplier_pagination(int $perPage, bool $cacheSuppliersFiltered)
     {
+        config(['cache_suppliers_filtered' => $cacheSuppliersFiltered]);
+
         Supplier::factory()->count(15)->create();
         $maxPage = ceil(15 / $perPage);
 
@@ -80,15 +82,22 @@ class SupplierTest extends TestCase
     public static function paginationDataProvider(): array
     {
         return [
-            [1],
-            [5],
-            [10],
-            [15],
+            [1, true],
+            [1, false],
+            [5, true],
+            [5, false],
+            [10, true],
+            [10, false],
+            [15, true],
+            [15, false],
         ];
     }
 
-    public function test_get_supplier_with_search()
+    #[DataProvider('searchDataProvider')]
+    public function test_get_supplier_with_search(bool $cacheSuppliersFiltered)
     {
+        config(['cache_suppliers_filtered' => $cacheSuppliersFiltered]);
+
         $suppliers = Supplier::factory()->count(5)->create();
 
         foreach ($suppliers as $supplier) {
@@ -99,6 +108,66 @@ class SupplierTest extends TestCase
 
         $this->get('/api/suppliers?document_number=1234567890')
             ->assertJsonCount(0, 'data');
+    }
+
+    #[DataProvider('searchDataProvider')]
+    public function test_forget_cache_on_supplier_create(bool $cacheSuppliersFiltered)
+    {
+        config(['cache_suppliers_filtered' => $cacheSuppliersFiltered]);
+
+        $this->post('/api/suppliers', Supplier::factory()->make()->toArray());
+
+        $this->get('/api/suppliers')->assertJsonCount(1, 'data');
+
+        $this->post('/api/suppliers', Supplier::factory()->make()->toArray());
+
+        $this->get('/api/suppliers')->assertJsonCount(2, 'data');
+    }
+
+    #[DataProvider('searchDataProvider')]
+    public function test_forget_cache_on_supplier_update(bool $cacheSuppliersFiltered)
+    {
+        config(['cache_suppliers_filtered' => $cacheSuppliersFiltered]);
+
+        $supplier = Supplier::factory()->create();
+
+        $this->get('/api/suppliers')->assertJsonCount(1, 'data');
+
+        $newSupplier = Supplier::factory()->make();
+
+        $this->put("/api/suppliers/{$supplier->id}", $newSupplier->toArray());
+
+        $this->get('/api/suppliers')->assertJsonCount(1, 'data')->assertJsonFragment([
+            'id' => $supplier->id,
+            'name' => $newSupplier->name,
+            'document_type' => $newSupplier->document_type,
+            'document_number' => $newSupplier->document_number,
+            'email' => $newSupplier->email,
+            'phone' => $newSupplier->phone,
+            'address' => $newSupplier->address,
+        ]);
+    }
+
+    #[DataProvider('searchDataProvider')]
+    public function test_forget_cache_on_supplier_delete(bool $cacheSuppliersFiltered)
+    {
+        config(['cache_suppliers_filtered' => $cacheSuppliersFiltered]);
+
+        $supplier = Supplier::factory()->create();
+
+        $this->get('/api/suppliers')->assertJsonCount(1, 'data');
+
+        $this->delete("/api/suppliers/{$supplier->id}");
+
+        $this->get('/api/suppliers')->assertJsonCount(0, 'data');
+    }
+
+    public static function searchDataProvider(): array
+    {
+        return [
+            [true],
+            [false],
+        ];
     }
 
     public function test_store_supplier()
@@ -189,7 +258,7 @@ class SupplierTest extends TestCase
             [['name' => '', 'email' => '', 'phone' => '', 'address' => ''], 'name'],
             [['name' => str_repeat('a', 256), 'email' => '', 'phone' => '', 'address' => ''], 'name'],
             [['name' => 'Supplier Company', 'email' => '', 'phone' => '', 'address' => ''], 'email'],
-            [['name' => 'Supplier Company', 'email' => str_repeat('a', 256).'@test.com', 'phone' => '', 'address' => ''], 'email'],
+            [['name' => 'Supplier Company', 'email' => str_repeat('a', 256) . '@test.com', 'phone' => '', 'address' => ''], 'email'],
             [['name' => 'Supplier Company', 'email' => 'test.test', 'phone' => '', 'address' => ''], 'email'],
             [['name' => 'Supplier Company', 'email' => 'test@test.com', 'phone' => '', 'address' => ''], 'phone'],
             [['name' => 'Supplier Company', 'email' => 'test@test.com', 'phone' => '9999999999999999', 'address' => ''], 'phone'],

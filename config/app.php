@@ -2,6 +2,8 @@
 
 return [
 
+    'cache_suppliers_filtered' => env('CACHE_SUPPLIERS_FILTERED', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
