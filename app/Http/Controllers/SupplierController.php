@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSupplierRequest;
 use App\Http\Requests\UpdateSupplierRequest;
 use App\Models\Supplier;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class SupplierController extends Controller
@@ -14,7 +15,7 @@ class SupplierController extends Controller
      *
      * @response array{status: string, message: string, data: Supplier[]}
      */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $validated = $request->validate([
             /**
@@ -51,7 +52,7 @@ class SupplierController extends Controller
      *
      * @response array{status: string, message: string, data: Supplier}
      */
-    public function store(StoreSupplierRequest $request)
+    public function store(StoreSupplierRequest $request): JsonResponse
     {
         $supplier = Supplier::create($request->validated());
 
@@ -67,7 +68,7 @@ class SupplierController extends Controller
      *
      * @response array{status: string, message: string, data: Supplier}
      */
-    public function update(UpdateSupplierRequest $request, Supplier $supplier)
+    public function update(UpdateSupplierRequest $request, Supplier $supplier): JsonResponse
     {
         $supplier->update($request->validated());
 
@@ -81,7 +82,7 @@ class SupplierController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Supplier $supplier)
+    public function destroy(Supplier $supplier): JsonResponse
     {
         $supplier->delete();
 

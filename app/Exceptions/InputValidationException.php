@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 
 class InputValidationException extends Exception
 {
+    /** @var int */
     protected $code = 422;
 
     public function __construct(protected Validator $validator)
