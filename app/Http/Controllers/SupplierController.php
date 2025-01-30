@@ -43,8 +43,33 @@ class SupplierController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Data successfully retrieved.',
-            'data' => Supplier::search($validated)->simplePaginate($validated['per_page'] ?? 10)->items(),
+            'data' => $this->getSuppliers($validated),
         ]);
+    }
+
+    /**
+     * @param array{page: int|null, per_page: int|null, document_number: string|null} $filters
+     * @return Supplier[]
+     */
+    protected function getSuppliers(array $filters): array
+    {
+        $filters['page'] = $filters['page'] ?? 1;
+        $filters['per_page'] = $filters['per_page'] ?? 10;
+        $filters['document_number'] = $filters['document_number'] ?? false;
+
+        if (config('cache_suppliers_filtered')) {
+            return cache()->tags('suppliers')->rememberForever(
+                "suppliers::" . serialize($filters),
+                fn () => Supplier::search($filters)->simplePaginate($filters['per_page'])->items()
+            );
+        }
+
+        return cache()->tags('suppliers')->rememberForever("suppliers::all", fn () => Supplier::all())
+            ->when(
+                $filters['document_number'],
+                fn ($suppliers) => $suppliers->where('document_number', $filters['document_number'])
+            )
+            ->slice(($filters['page'] - 1) * $filters['per_page'], $filters['per_page'])->all();
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 class SafeCnpj implements ValidationRule
@@ -22,6 +23,8 @@ class SafeCnpj implements ValidationRule
 
     public static function validateBrasilApi(string $cnpj): bool
     {
-        return Http::get("https://brasilapi.com.br/api/cnpj/v1/$cnpj")->successful();
+        return (bool) Cache::remember($cnpj, now()->addMonth(), function () use ($cnpj) {
+            return Http::get("https://brasilapi.com.br/api/cnpj/v1/$cnpj")->successful();
+        });
     }
 }
