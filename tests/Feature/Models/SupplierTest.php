@@ -11,7 +11,8 @@ use Tests\TestCase;
 
 class SupplierTest extends TestCase
 {
-    use RefreshDatabase, WithFaker;
+    use RefreshDatabase;
+    use WithFaker;
 
     protected function setUp(): void
     {
@@ -99,7 +100,6 @@ class SupplierTest extends TestCase
         $this->get('/api/suppliers?document_number=1234567890')
             ->assertJsonCount(0, 'data');
     }
-
 
     public function test_store_supplier()
     {
@@ -189,7 +189,7 @@ class SupplierTest extends TestCase
             [['name' => '', 'email' => '', 'phone' => '', 'address' => ''], 'name'],
             [['name' => str_repeat('a', 256), 'email' => '', 'phone' => '', 'address' => ''], 'name'],
             [['name' => 'Supplier Company', 'email' => '', 'phone' => '', 'address' => ''], 'email'],
-            [['name' => 'Supplier Company', 'email' => str_repeat('a', 256) . '@test.com', 'phone' => '', 'address' => ''], 'email'],
+            [['name' => 'Supplier Company', 'email' => str_repeat('a', 256).'@test.com', 'phone' => '', 'address' => ''], 'email'],
             [['name' => 'Supplier Company', 'email' => 'test.test', 'phone' => '', 'address' => ''], 'email'],
             [['name' => 'Supplier Company', 'email' => 'test@test.com', 'phone' => '', 'address' => ''], 'phone'],
             [['name' => 'Supplier Company', 'email' => 'test@test.com', 'phone' => '9999999999999999', 'address' => ''], 'phone'],
@@ -230,7 +230,6 @@ class SupplierTest extends TestCase
 
         $this->assertDatabaseHas('suppliers', $data);
     }
-
 
     public function test_update_supplier_not_found()
     {

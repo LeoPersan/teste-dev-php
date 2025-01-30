@@ -7,7 +7,7 @@ use Dedoc\Scramble\Support\Type\Type;
 
 class AuthorizationExceptionToResponseExtension extends ExceptionToResponseExtension
 {
-    public function shouldHandle(Type $type)
+    public function shouldHandle(Type $type): bool
     {
         return false;
     }

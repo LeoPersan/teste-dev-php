@@ -14,14 +14,14 @@ class Cpf implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!self::validateCpf($value)) {
-            $fail("The :attribute is invalid.");
+        if (!is_string($value) || !self::validateCpf($value)) {
+            $fail('The :attribute is invalid.');
         }
     }
 
     public static function validateCpf(string $cpf): bool
     {
-        $cpf = preg_replace('/[^0-9]/', '', (string) $cpf);
+        $cpf = (string) preg_replace('/[^0-9]/', '', $cpf);
 
         if (strlen($cpf) !== 11) {
             return false;
@@ -33,7 +33,7 @@ class Cpf implements ValidationRule
 
         for ($i = 9; $i < 11; $i++) {
             for ($j = 0, $sum = 0; $j < $i; $j++) {
-                $sum += $cpf[$j] * (($i + 1) - $j);
+                $sum += ((int) $cpf[$j]) * (($i + 1) - $j);
             }
             $sum = 11 - ($sum % 11);
             $sum = $sum >= 10 ? 0 : $sum;

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,11 +12,6 @@ class Supplier extends Model
     /** @use HasFactory<\Database\Factories\SupplierFactory> */
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<string>
-     */
     protected $fillable = [
         'name',
         'document_type',
@@ -30,6 +26,9 @@ class Supplier extends Model
         'updated_at',
     ];
 
+    /**
+     * @return Attribute<callable, callable>
+     */
     public function documentNumber(): Attribute
     {
         return Attribute::make(
@@ -38,6 +37,9 @@ class Supplier extends Model
         );
     }
 
+    /**
+     * @return Attribute<callable, callable>
+     */
     public function phone(): Attribute
     {
         return Attribute::make(
@@ -46,16 +48,24 @@ class Supplier extends Model
         );
     }
 
-    public function scopeSearch($query, array $filters)
+    /**
+     * @param  Builder<Supplier>  $query
+     * @param  array<string, mixed>  $filters
+     */
+    public function scopeSearch(Builder $query, array $filters): void
     {
         $query->when(
-            $filters['document_number'] ?? null,
-            fn ($query, $documentNumber) => $query->documentNumber($documentNumber)
+            $filters['document_number'] ?? '',
+            fn ($query, $documentNumber) => is_string($documentNumber) && $query->documentNumber($documentNumber)
         );
     }
 
-    public function scopeDocumentNumber($query, $documentNumber)
+    /**
+     * @param  Builder<Supplier>  $query
+     * @param  string  $documentNumber
+     */
+    public function scopeDocumentNumber(Builder $query, string $documentNumber): void
     {
-        return $query->where('document_number', preg_replace('/[^0-9]/', '', $documentNumber));
+        $query->where('document_number', preg_replace('/[^0-9]/', '', $documentNumber));
     }
 }

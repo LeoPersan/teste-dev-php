@@ -14,14 +14,14 @@ class Cnpj implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!self::validateCnpj($value)) {
-            $fail("The :attribute is invalid.");
+        if (!is_string($value) || ! self::validateCnpj($value)) {
+            $fail('The :attribute is invalid.');
         }
     }
 
     public static function validateCnpj(string $cnpj): bool
     {
-        $cnpj = preg_replace('/[^0-9]/', '', (string) $cnpj);
+        $cnpj = (string) preg_replace('/[^0-9]/', '', $cnpj);
 
         if (strlen($cnpj) !== 14) {
             return false;
@@ -33,8 +33,8 @@ class Cnpj implements ValidationRule
 
         for ($i = 12; $i < 14; $i++) {
             for ($j = 0, $sum = 0, $factor = $i - 7; $j < $i; $j++, $factor--) {
-                $sum += $cnpj[$j] * $factor;
-                if($factor == 2) {
+                $sum += ((int) $cnpj[$j]) * $factor;
+                if ($factor == 2) {
                     $factor = 10;
                 }
             }

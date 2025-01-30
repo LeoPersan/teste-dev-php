@@ -9,11 +9,16 @@ use Illuminate\Contracts\Validation\ValidationRule;
 
 class CnpjCpf implements DataAwareRule, ValidationRule
 {
+    /** @var array<string, mixed> */
     protected array $data = [];
 
-    public function __construct(protected readonly bool $safe = true) {
+    public function __construct(protected readonly bool $safe = true)
+    {
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     public function setData(array $data): static
     {
         $this->data = $data;
@@ -28,17 +33,21 @@ class CnpjCpf implements DataAwareRule, ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!$this->validateAux($value)) {
-            $fail("The :attribute is invalid.");
+        if (!is_string($value) || !$this->validateAux($value)) {
+            $fail('The :attribute is invalid.');
         }
     }
 
     public function validateAux(string $cnpjCpf): bool
     {
-        return match ($this->data['document_type']) {
-            DocumentType::CPF->value => Cpf::validateCpf($cnpjCpf),
-            DocumentType::CNPJ->value => Cnpj::validateCnpj($cnpjCpf)
-                                            && ($this->safe ? SafeCnpj::validateBrasilApi($cnpjCpf) : true),
+        if (!is_string($this->data['document_type'])) {
+            return false;
+        }
+
+        return match (DocumentType::from($this->data['document_type'])) {
+            DocumentType::CPF => Cpf::validateCpf($cnpjCpf),
+            DocumentType::CNPJ => Cnpj::validateCnpj($cnpjCpf)
+                && ($this->safe ? SafeCnpj::validateBrasilApi($cnpjCpf) : true),
         };
     }
 }

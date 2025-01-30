@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class NotFoundExceptionToResponseExtension extends ExceptionToResponseExtension
 {
-    public function shouldHandle(Type $type)
+    public function shouldHandle(Type $type): bool
     {
         return $type instanceof ObjectType
             && (
@@ -24,17 +24,17 @@ class NotFoundExceptionToResponseExtension extends ExceptionToResponseExtension
             );
     }
 
-    public function toResponse(Type $type)
+    public function toResponse(Type $type): Response
     {
-        $validationResponseBodyType = (new OpenApiTypes\ObjectType)
+        $validationResponseBodyType = (new OpenApiTypes\ObjectType())
             ->addProperty(
                 'status',
-                (new OpenApiTypes\StringType)
+                (new OpenApiTypes\StringType())
                     ->setDescription('"success" or "error"')
             )
             ->addProperty(
                 'message',
-                (new OpenApiTypes\StringType)
+                (new OpenApiTypes\StringType())
                     ->setDescription('Error overview.')
             )
             ->setRequired(['message']);
@@ -47,7 +47,7 @@ class NotFoundExceptionToResponseExtension extends ExceptionToResponseExtension
             );
     }
 
-    public function reference(ObjectType $type)
+    public function reference(ObjectType $type): Reference
     {
         return new Reference('responses', Str::start($type->name, '\\'), $this->components);
     }

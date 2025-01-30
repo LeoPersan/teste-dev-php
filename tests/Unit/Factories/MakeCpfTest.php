@@ -18,7 +18,7 @@ class MakeCpfTest extends TestCase
     public static function cpfDataProvider(): array
     {
         $data = [];
-        for($i = 0; $i < 20; $i++) {
+        for ($i = 0; $i < 20; $i++) {
             $data[$i] = [MakeCpf::make()];
         }
 

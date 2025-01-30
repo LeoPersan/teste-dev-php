@@ -15,8 +15,8 @@ class SafeCnpj implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!self::validateBrasilApi($value)) {
-            $fail("The :attribute is invalid.");
+        if (!is_string($value) || !self::validateBrasilApi($value)) {
+            $fail('The :attribute is invalid.');
         }
     }
 
