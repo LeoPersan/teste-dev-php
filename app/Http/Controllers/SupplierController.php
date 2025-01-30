@@ -11,18 +11,41 @@ class SupplierController extends Controller
 {
     /**
      * Display a listing of the resource.
+     *
+     * @response array{status: string, message: string, data: Supplier[]}
      */
     public function index(Request $request)
     {
+        $validated = $request->validate([
+            /**
+             * @query
+             * @default 1
+             */
+            'page' => ['integer', 'min:1'],
+            /**
+             * @query
+             * @default 10
+             */
+            'per_page' => ['integer', 'min:1'],
+            /**
+             * Filter Supplier by CPF or CNPJ.
+             * @query
+             * @example 99.999.999/0001-99
+             */
+            'document_number' => ['string', 'max:18'],
+        ]);
+
         return response()->json([
             'status' => 'success',
             'message' => 'Data successfully retrieved.',
-            'data' => Supplier::search($request->all())->simplePaginate($request->per_page ?? 10)->items(),
+            'data' => Supplier::search($validated)->simplePaginate($validated['per_page'] ?? 10)->items(),
         ]);
     }
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @response array{status: string, message: string, data: Supplier}
      */
     public function store(StoreSupplierRequest $request)
     {
@@ -36,15 +59,9 @@ class SupplierController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Supplier $supplier)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
+     *
+     * @response array{status: string, message: string, data: Supplier}
      */
     public function update(UpdateSupplierRequest $request, Supplier $supplier)
     {
