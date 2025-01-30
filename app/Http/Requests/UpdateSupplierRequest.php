@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\DocumentType;
+use App\Rules\CnpjCpf;
 use Illuminate\Validation\Rule;
 
 class UpdateSupplierRequest extends AbstractRequest
@@ -24,7 +25,7 @@ class UpdateSupplierRequest extends AbstractRequest
     {
         return [
             'document_type' => ['required', 'string', 'max:4', Rule::enum(DocumentType::class)],
-            'document_number' => ['required', 'string', 'max:14'],
+            'document_number' => ['required', 'string', 'max:14', new CnpjCpf(true)],
             'name' => ['string', 'min:3', 'max:255'],
             'email' => ['string', 'email', 'max:255'],
             'phone' => ['string', 'max:15'],
