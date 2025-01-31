@@ -50,6 +50,50 @@ class Supplier extends Model
 
     /**
      * @param  Builder<Supplier>  $query
+     * @param array{page: int|null, per_page: int|null, document_number: string|null} $filters
+     * @return Supplier[]
+     */
+    protected function scopeSearchWithCache(Builder $query, array $filters): array
+    {
+        $filters = ['page' => 1, 'per_page' => 10, 'document_number' => false, ...$filters];
+
+        if (config('cache_suppliers_filtered')) {
+            return $this->cacheFiltered($query, $filters);
+        }
+
+        return $this->cacheAll($query, $filters);
+    }
+
+    /**
+     * @param  Builder<Supplier>  $query
+     * @param array{page: int|null, per_page: int|null, document_number: string|null} $filters
+     * @return Supplier[]
+     */
+    protected function cacheFiltered(Builder $query, array $filters): array
+    {
+        return cache()->tags('suppliers')->rememberForever(
+            "suppliers::" . serialize($filters),
+            fn () => $query->search($filters)->simplePaginate($filters['per_page'])->items()
+        );
+    }
+
+    /**
+     * @param  Builder<Supplier>  $query
+     * @param array{page: int|null, per_page: int|null, document_number: string|null} $filters
+     * @return Supplier[]
+     */
+    protected function cacheAll(Builder $query, array $filters): array
+    {
+        return cache()->tags('suppliers')->rememberForever("suppliers::all", fn () => $query->get())
+            ->when(
+                $filters['document_number'],
+                fn ($suppliers) => $suppliers->where('document_number', $filters['document_number'])
+            )
+            ->slice(($filters['page'] - 1) * $filters['per_page'], $filters['per_page'])->all();
+    }
+
+    /**
+     * @param  Builder<Supplier>  $query
      * @param  array<string, mixed>  $filters
      */
     public function scopeSearch(Builder $query, array $filters): void
