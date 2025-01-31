@@ -1,66 +1,174 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistema de Fornecedores
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Índice
+1. [Introdução](#introdução)
+2. [Recursos](#recursos)
+3. [Instalação](#instalação)
+    1. [Requisitos](#requisitos)
+    2. [Com Docker](#com-docker)
+    3. [Sem Docker](#sem-docker)
+4. [Uso](#uso)
+5. [Configuração](#configuração)
+6. [Contribuição](#contribuição)
+7. [Licença](#licença)
+8. [Contato](#contato)
 
-## About Laravel
+## Introdução
+Este é um sistema de gerenciamento de fornecedores através de. Ele permite que você cadastre, edite, remova e visualize fornecedores. O sistema também permite que você faça buscas de fornecedores, filtrando por CNPJ e utilizando paginação.
+> [⬆️Índice](#índice)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Recursos
+- Cadastro de fornecedores
+- Edição de fornecedores
+- Remoção de fornecedores
+- Visualização de fornecedores
+- Busca de fornecedores por CNPJ
+> [⬆️Índice](#índice)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Instalação
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Com Docker
 
-## Learning Laravel
+Você deve começar clonando o repositório do projeto em sua máquina local.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```bash
+git clone https://github.com/LeoPersan/teste-dev-php.git
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Em seguida, você deve entrar na pasta do projeto e criar um arquivo `.env`.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+cd teste-dev-php
+cp .env.example .env
+```
 
-## Laravel Sponsors
+Agora você deve instalar as dependências do projeto.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v "$(pwd):/var/www/html" \
+    -w /var/www/html \
+    laravelsail/php82-composer:latest \
+    composer install --ignore-platform-reqs
+```
+> **Nota:** Adicione o argumento `--dev` ao final do comando para instalar as dependências de desenvolvimento e poder rodar testes e análises estáticas.
 
-### Premium Partners
+Agora você deve construir a imagem do Docker e iniciar o container.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+```bash
+./vendor/bin/sail up -d
+```
 
-## Contributing
+Em seguida, você deve gerar a chave de aplicação.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+./vendor/bin/sail artisan key:generate
+```
 
-## Code of Conduct
+Agora você deve criar banco de dados.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+./vendor/bin/sail artisan migrate
+```
 
-## Security Vulnerabilities
+Por fim, você deve acessar o sistema através do navegador.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```
+http://localhost
+```
+> [⬆️Índice](#índice)
 
-## License
+### Sem Docker
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+#### Requisitos
+- Linux
+- PHP 8.2
+  - Ctype
+  - cURL
+  - DOM
+  - Fileinfo
+  - Filter
+  - Hash
+  - Mbstring
+  - OpenSSL
+  - PCRE
+  - PDO
+  - Session
+  - Tokenizer
+  - XML
+- Composer
+- MySQL 8.0
+
+Você deve começar clonando o repositório do projeto em sua máquina local.
+
+```bash
+git clone https://github.com/LeoPersan/teste-dev-php.git
+```
+
+Em seguida, você deve entrar na pasta do projeto e criar um arquivo `.env`.
+
+```bash
+cd teste-dev-php
+cp .env.example .env
+```
+
+Troque a seguinte variável de ambiente no arquivo `.env`.
+
+```bash
+DB_HOST=127.0.0.1
+```
+
+Agora você deve instalar as dependências do projeto.
+
+```bash
+composer install
+```
+> **Nota:** Adicione o argumento `--dev` ao final do comando para instalar as dependências de desenvolvimento e poder rodar testes e análises estáticas.
+
+Agora você deve gerar a chave de aplicação.
+
+```bash
+php artisan key:generate
+```
+
+Agora você deve criar banco de dados.
+
+```bash
+php artisan migrate
+```
+
+Por fim, você deve acessar o sistema através do navegador.
+
+```
+http://localhost
+```
+> [⬆️Índice](#índice)
+
+## Uso
+Você pode acessar o sistema através do navegador. Acessando a URL `http://localhost/docs/api` você terá acesso a documentação da API.
+
+Você pode utilizar as páginas de documentação para testar as rotas da API.
+> [⬆️Índice](#índice)
+
+## Comandos Úteis
+
+- Rodar testes
+```bash
+./vendor/bin/sail artisan test
+# OU
+php artisan test
+```
+- Rodar análise estática
+```bash
+./vendor/bin/sail php ./vendor/bin/phpstan analyse
+# OU
+./vendor/bin/phpstan analyse
+```
+- Rodar Correção de Estilo
+```bash
+./vendor/bin/sail php ./vendor/bin/pint
+# OU
+./vendor/bin/pint
+```
+> [⬆️Índice](#índice)
