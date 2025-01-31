@@ -7,10 +7,6 @@
     1. [Com Docker](#com-docker)
     2. [Sem Docker](#sem-docker)
 4. [Uso](#uso)
-5. [Configuração](#configuração)
-6. [Contribuição](#contribuição)
-7. [Licença](#licença)
-8. [Contato](#contato)
 
 ## Introdução
 Este é um sistema de gerenciamento de fornecedores através de. Ele permite que você cadastre, edite, remova e visualize fornecedores. O sistema também permite que você faça buscas de fornecedores, filtrando por CNPJ e utilizando paginação.
